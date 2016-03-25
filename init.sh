@@ -18,17 +18,14 @@ if ! type "$chec_solo" > /dev/null; then
 	# Chef Client
 	curl -L https://www.opscode.com/chef/install.sh | sudo bash
 
-	# create work directory
-	mkdir /var/chef
-
-	#gem update --no-rdoc --no-ri
-	#gem install chef --no-rdoc --no-ri
 fi &&
 
 # goto working directory
-cd /var/chef
+cd /var
 
 # check out cookbooks into working directory
+git clone https://github.com/thato-mokaila/chef.git
+cd chef/
 
 # run chef to prep the system
 "$chec_solo" -c solo.rb -j solo.json
