@@ -1,0 +1,1 @@
+default["mq"]["install.path"] = "/opt/mqm"
