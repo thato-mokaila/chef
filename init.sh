@@ -27,7 +27,8 @@ cd /var && mkdir -p /tmp/mq_install/scripts
 git clone https://github.com/thato-mokaila/chef.git
 chmod -R 755 ./chef && cd ./chef/ 
 cp -r ./scripts/mq/ /tmp/mq_install/scripts
-cp -r ./scripts/mq/ /usr/local/sbin
+cp -r ./scripts/mq/functions.sh /usr/local/sbin
+cp -r ./scripts/mq/mqconfig.sh /usr/local/sbin
 
 # run chef to prep the system
 "$chec_solo" -c solo.rb -j node.json

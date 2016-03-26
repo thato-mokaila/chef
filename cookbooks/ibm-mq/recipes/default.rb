@@ -32,3 +32,49 @@ bash "prepare_mq_environment" do
 	echo "# Finished exporting variables..."
   EOH
 end
+
+# update user limits
+file "/etc/security/limits.d/#{node[:MQ][:USER][:NAME]}.conf" do
+  content "
+		#{node[:MQ][:USER][:NAME]} soft nofile #{node[:MQ][:FDMAX]}
+		#{node[:MQ][:USER][:NAME]} hard nofile #{node[:MQ][:FDMAX]}
+		#{node[:MQ][:USER][:NAME]} soft nproc #{node[:MQ][:FDMAX]}
+		#{node[:MQ][:USER][:NAME]} hard nproc #{node[:MQ][:FDMAX]}
+  "
+  mode '0755'
+  owner 'mqm'
+  group 'mqm'
+end
+
+# update user limits [root]
+file "/etc/security/limits.d/root.conf" do
+  content "
+		root soft nofile #{node[:MQ][:FDMAX]}
+		root hard nofile #{node[:MQ][:FDMAX]}
+		root soft nproc #{node[:MQ][:FDMAX]}
+		root hard nproc #{node[:MQ][:FDMAX]}
+  "
+  mode '0755'
+  owner 'root'
+  group 'root'
+end
+
+# update user limits
+bash "UpdateSysctl" do
+  code <<-EOH
+    echo "# updating kernel parameters"
+    sysctl -w fs.file-max = #{node[:MQ][:FDMAX]}
+    sysctl -w net.ipv4.ip_local_port_range = '1024 65535'
+    sysctl -w vm.max_map_count = 1966080
+    sysctl -w kernel.pid_max = 4194303
+    sysctl -w kernel.sem = '1000 1024000 500 8192'
+    sysctl -w kernel.msgmnb = 131072
+    sysctl -w kernel.msgmax = 131072
+    sysctl -w kernel.msgmni = 2048
+    sysctl -w kernel.shmmni = 8192
+    sysctl -w kernel.shmall = 536870912
+    sysctl -w kernel.shmmax = 137438953472
+    sysctl -w net.ipv4.tcp_keepalive_time = 300
+    echo "# Finished udating kernel parameters ..."
+  EOH
+end

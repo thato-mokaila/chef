@@ -3,8 +3,8 @@
 # Shell functions for unix. This file is intended to be sourced by other scripts.
 # Courtesy of the IBM Hursley Lab.
 
-ECHON=${ECHON-echo}
-me=$(basename $0)
+#ECHON=${ECHON-echo}
+#me=$(basename $0)
 
 ##############################################################################
 # regexify
