@@ -60,11 +60,11 @@ file "/etc/security/limits.d/root.conf" do
 end
 
 # update user limits
-bash "UpdateSysctl" do
+bash "update_kernel_parameters" do
   code <<-EOH
-    echo "# updating kernel parameters"
-    sysctl -w fs.file-max = #{node[:MQ][:FDMAX]}
-    sysctl -w net.ipv4.ip_local_port_range = '1024 65535'
+    echo "# updating kernel parameters..."
+    sysctl -w fs.file-max=#{node[:MQ][:FDMAX]}
+    sysctl -w net.ipv4.ip_local_port_range='1024 65535'
     sysctl -w vm.max_map_count=1966080
     sysctl -w kernel.pid_max=4194303
     sysctl -w kernel.sem='1000 1024000 500 8192'
@@ -78,3 +78,32 @@ bash "UpdateSysctl" do
     echo "# Finished udating kernel parameters ..."
   EOH
 end
+
+# update user limits
+bash "install_mq" do
+  code <<-EOH
+
+    echo "# installing  WebSphere MQ 8.0 Developers Edition..."
+    
+    mkdir #{node[:MQ][:SOURCE][:DOWNLOAD][:PATH]}/wmq_install_unzipped | true
+    cd #{node[:MQ][:SOURCE][:DOWNLOAD][:PATH]}/wmq_install_unzipped
+    tar xvf #{node[:MQ][:SOURCE][:DOWNLOAD][:PATH]}/#{node[:MQ][:SOURCE][:FILENAME]}
+    cd #{node[:MQ][:MQ_EXLPODED_DIR]}
+
+    # Accept IBM license
+	./mqlicense.sh -accept
+
+	# install MQ binaries
+	rpm --prefix $WMQ_INSTALL_DIR -ivh MQSeriesRuntime-*.rpm MQSeriesServer-*.rpm MQSeriesClient-*.rpm MQSeriesSDK-*.rpm  MQSeriesMan-*.rpm MQSeriesSamples-*.rpm MQSeriesJRE-*.rpm MQSeriesExplorer-*.rpm MQSeriesJava-*.rpm
+
+	# Define this as a primary installation
+	#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/setmqinst -i -p #{node[:MQ][:WMQ_INSTALL_DIR]}
+
+	# Show the version of WMQ that we just installed
+	#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/dspmqver
+
+    echo "# Finished installing  WebSphere MQ 8.0 Developers Edition..."
+
+  EOH
+end
+

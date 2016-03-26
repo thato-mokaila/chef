@@ -29,5 +29,6 @@ default[:MQ][:QMGR][:LOGPATH]	 = "/var/mqm/DEV_QM_LOG"
 
 default[:MQ][:SOURCE][:URL] = "http://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev80_linux_x86-64.tar.gz"
 default[:MQ][:SOURCE][:FILENAME] = "mqadv_dev80_linux_x86-64.tar.gz"
+default[:MQ][:EXPLODED][:DIR] = "mqadv_dev80_linux_x86-64.tar.gz"
 default[:MQ][:SOURCE][:DOWNLOAD][:PATH] = "/tmp/mq_install"
 
