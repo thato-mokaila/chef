@@ -1,7 +1,6 @@
 {
 	"mq":{
-		"install_install_dir":"/opt/mqm",
-		"install_script_dir":"/tmp/mq_install/scripts"
+		"version":"8.0.0.4"
 	},
     "run_list": ["ibm-mq"]
 }

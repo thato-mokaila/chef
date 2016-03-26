@@ -6,21 +6,29 @@
 #
 # All rights reserved - Do Not Redistribute
 #
-script "prepare_mq_environment" do
-  interpreter "bash"
-  user "root"
-  cwd "#{node['mq']['install_script_dir']}"
+
+Chef::Log.debug "Output: #{ output.stdout }"
+::Chef::Recipe.send(:include, MQCookbook::Helper)
+
+# create group 'mqm'
+group node[:MQ][:USER][:GROUP]
+
+# add mq install user
+user node[:MQ][:USER][:NAME] do
+	comment 'A user required to install MQ'
+  	group node[:MQ][:USER][:GROUP]
+  	home node[:MQ][:USER][:HOME]
+  	system true
+  	shell '/bin/bash'
+end
+
+# prep mq environment
+bash "prepare_mq_environment" do
   code <<-EOH
-    #insert bash script
-	export WMQ_INSTALL_DIR=/opt/mqm
-	export LD_LIBRARY_PATH=$WMQ_INSTALL_DIR/java/lib64
-	export JAVA_HOME=$WMQ_INSTALL_DIR/java/jre64/jre
-	export PATH=$PATH:$WMQ_INSTALL_DIR/bin:$JAVA_HOME/bin
-	export QM=QM1
-	export PORT=1414
-	export REQUESTQ=REQUEST_Q
-	export REPLYQ=REPLY_Q
-	export INSTALL_USER=developer
-	export MQ_EXLPODED_DIR=MQServer
+    echo "# Exporting variables..."
+	export LD_LIBRARY_PATH="#{node[:MQ][:WMQ_INSTALL_DIR]}/java/lib64"
+	export JAVA_HOME="#{node[:MQ][:WMQ_INSTALL_DIR]}/java/jre64/jre"
+	export PATH="#{ENV['PATH']}:#{node[:MQ][:WMQ_INSTALL_DIR]}/bin:#{ENV['JAVA_HOME']}/bin"
+	echo "# Finished exporting variables..."
   EOH
 end

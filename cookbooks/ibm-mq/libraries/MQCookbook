@@ -1,0 +1,9 @@
+module MQCookbook
+  module Helper
+
+    def updateUserLimits(param1)
+      # your code here
+    end
+
+  end
+end
