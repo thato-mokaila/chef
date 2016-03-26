@@ -7,8 +7,8 @@
 # All rights reserved - Do Not Redistribute
 #
 
-Chef::Log.debug "Output: #{ output.stdout }"
-::Chef::Recipe.send(:include, MQCookbook::Helper)
+#Chef::Log.debug "Output: #{ output.stdout }"
+#Chef::Recipe.send(:include, MQCookbook::Helper)
 
 # create group 'mqm'
 group node[:MQ][:USER][:GROUP]
