@@ -1,2 +1,2 @@
-default["mq"]["install.path"] = "/opt/mqm"
-default["mq"]["install.script.dir"] = "/tmp/mq_install/scripts"
+default["mq"]["install_path"] = "/opt/mqm"
+default["mq"]["install_script_dir"] = "/tmp/mq_install/scripts"
