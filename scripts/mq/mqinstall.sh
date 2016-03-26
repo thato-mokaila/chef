@@ -61,7 +61,8 @@ FDMAX=1048576
 
 # Feel free to change these as you see fit
 DOWNLOAD_PATH=/tmp/mq_install
-WMQ_ARCHIVE=http://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev80_linux_x86-64.tar.gz
+wget http://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev80_linux_x86-64.tar.gz -O $DOWNLOAD_PATH
+WMQ_ARCHIVE=mqadv_dev80_linux_x86-64.tar.gz
 
 # For best performance your queque file and your log file really should point to two separate physical disks, but for this test we don't care
 QM_DATA_PATH=/var/mqm/${QM}_DATA
