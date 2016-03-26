@@ -13,7 +13,7 @@ if ! type "$chec_solo" > /dev/null; then
 	# update system to latest
 	yum update
 
-	yum install -y gcc ruby-devel rubygems git
+	yum -y install gcc ruby-devel rubygems git
 
 	# Chef Client
 	curl -L https://www.opscode.com/chef/install.sh | sudo bash
@@ -25,7 +25,8 @@ cd /var
 
 # check out cookbooks into working directory
 git clone https://github.com/thato-mokaila/chef.git
-cd chef/
+chmod 755 -r /chef && cd chef/ 
+cp -r ./scripts/mq/ /tmp/mq_install/scripts
 
 # run chef to prep the system
 "$chec_solo" -c solo.rb -j solo.json
