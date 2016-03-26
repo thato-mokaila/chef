@@ -6,12 +6,12 @@
 #
 # All rights reserved - Do Not Redistribute
 #
-
-cookbook_file "#{node['mq']['install_script_dir']}/setenv.sh" do
-  source "setenv.sh"
-  mode 0755
-end
-
-execute 'set_mq_environment' do
-  command "sh #{node['mq']['install_script_dir']}/setenv.sh"
+script "prepare_mq_environment" do
+  interpreter "bash"
+  user "root"
+  cwd "#{node['mq']['install_script_dir']}"
+  code <<-EOH
+    #insert bash script
+    setenv.sh
+  EOH
 end
