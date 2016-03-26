@@ -7,16 +7,11 @@
 # All rights reserved - Do Not Redistribute
 #
 
-bash 'set_mq_environment' do
-  cwd ::File.dirname(node[:mq][:install_script_dir])
-  code <<-EOH
-    ./setenv.sh
-    EOH
+cookbook_file "#{node['mq']['install_script_dir']}/setenv.sh" do
+  source "setenv.sh"
+  mode 0755
 end
 
-bash 'install_websphere_mq' do
-  cwd ::File.dirname(node[:mq][:install_script_dir])
-  code <<-EOH
-    ./mqinstall.sh
-    EOH
+execute 'set_mq_environment' do
+  command "sh #{node['mq']['install_script_dir']}/setenv.sh"
 end

@@ -29,4 +29,4 @@ chmod -R 755 ./chef && cd ./chef/
 cp -r ./scripts/mq/ /tmp/mq_install/scripts
 
 # run chef to prep the system
-"$chec_solo" -c solo.rb -j solo.json
+"$chec_solo" -c solo.rb -j node.json
