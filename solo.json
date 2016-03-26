@@ -1,4 +1,4 @@
 {
-    "run_list": []
+    "run_list": ["ibm-mq"]
 }
 

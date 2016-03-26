@@ -21,11 +21,11 @@ if ! type "$chec_solo" > /dev/null; then
 fi &&
 
 # goto working directory
-cd /var
+cd /var && mkdir -p /tmp/mq_install/scripts
 
 # check out cookbooks into working directory
 git clone https://github.com/thato-mokaila/chef.git
-chmod 755 -r /chef && cd chef/ 
+chmod -R 755 ./chef && cd ./chef/ 
 cp -r ./scripts/mq/ /tmp/mq_install/scripts
 
 # run chef to prep the system
