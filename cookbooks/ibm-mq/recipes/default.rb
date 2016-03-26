@@ -8,14 +8,14 @@
 #
 
 bash 'set_mq_environment' do
-  cwd ::File.dirname(install_script_dir)
+  cwd ::File.dirname(node[:mq][:install_script_dir])
   code <<-EOH
     ./setenv.sh
     EOH
 end
 
 bash 'install_websphere_mq' do
-  cwd ::File.dirname(install_script_dir)
+  cwd ::File.dirname(node[:mq][:install_script_dir])
   code <<-EOH
     ./mqinstall.sh
     EOH
