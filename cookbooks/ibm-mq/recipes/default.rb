@@ -13,9 +13,9 @@
 # create group 'mqm'
 group node[:MQ][:USER][:GROUP]
 
-# add mq install user
+# add mq user
 user node[:MQ][:USER][:NAME] do
-	comment 'A user required to install MQ'
+	comment 'A user required to run MQ'
   	group node[:MQ][:USER][:GROUP]
   	home node[:MQ][:USER][:HOME]
   	system true

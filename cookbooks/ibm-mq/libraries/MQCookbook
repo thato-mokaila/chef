@@ -20,7 +20,7 @@ require "mixlib/shellout"
 module MQCookbook
   module Helper
 
-    def updateUserLimits(param1)
+    def updateUserLimits(mqm)
       # your code here
     end
 
