@@ -42,10 +42,10 @@ end
 # update user limits
 file "/etc/security/limits.d/#{node[:MQ][:USER][:NAME]}.conf" do
   content "
-		#{node[:MQ][:USER][:NAME]} soft nofile #{node[:MQ][:FDMAX]}
-		#{node[:MQ][:USER][:NAME]} hard nofile #{node[:MQ][:FDMAX]}
-		#{node[:MQ][:USER][:NAME]} soft nproc #{node[:MQ][:FDMAX]}
-		#{node[:MQ][:USER][:NAME]} hard nproc #{node[:MQ][:FDMAX]}
+	#{node[:MQ][:USER][:NAME]} soft nofile #{node[:MQ][:FDMAX]}
+	#{node[:MQ][:USER][:NAME]} hard nofile #{node[:MQ][:FDMAX]}
+	#{node[:MQ][:USER][:NAME]} soft nproc #{node[:MQ][:FDMAX]}
+	#{node[:MQ][:USER][:NAME]} hard nproc #{node[:MQ][:FDMAX]}
   "
   mode '0755'
   owner 'mqm'
@@ -55,10 +55,10 @@ end
 # update user limits [root]
 file "/etc/security/limits.d/root.conf" do
   content "
-		root soft nofile #{node[:MQ][:FDMAX]}
-		root hard nofile #{node[:MQ][:FDMAX]}
-		root soft nproc #{node[:MQ][:FDMAX]}
-		root hard nproc #{node[:MQ][:FDMAX]}
+	root soft nofile #{node[:MQ][:FDMAX]}
+	root hard nofile #{node[:MQ][:FDMAX]}
+	root soft nproc #{node[:MQ][:FDMAX]}
+	root hard nproc #{node[:MQ][:FDMAX]}
   "
   mode '0755'
   owner 'root'
@@ -76,16 +76,16 @@ bash "update_kernel_parameters" do
 
     sysctl -w fs.file-max=#{node[:MQ][:FDMAX]}
     sysctl -w net.ipv4.ip_local_port_range='1024 65535'
-    sysctl -w vm.max_map_count=1966080
-    sysctl -w kernel.pid_max=4194303
+    sysctl -w vm.max_map_count=#{node[:MQ][:MAX_MAP_COUNT]}
+    sysctl -w kernel.pid_max=#{node[:MQ][:PID_MAX]}
     sysctl -w kernel.sem='1000 1024000 500 8192'
-    sysctl -w kernel.msgmnb=131072
-    sysctl -w kernel.msgmax=131072
-    sysctl -w kernel.msgmni=2048
-    sysctl -w kernel.shmmni=8192
-    sysctl -w kernel.shmall=536870912
-    sysctl -w kernel.shmmax=137438953472
-    sysctl -w net.ipv4.tcp_keepalive_time=300
+    sysctl -w kernel.msgmnb=#{node[:MQ][:MSGMNB]}
+    sysctl -w kernel.msgmax=#{node[:MQ][:MSGMAX]}
+    sysctl -w kernel.msgmni=#{node[:MQ][:MSGMNI]}
+    sysctl -w kernel.shmmni=#{node[:MQ][:SHMMNI]}
+    sysctl -w kernel.shmall=#{node[:MQ][:SHMALL]}
+    sysctl -w kernel.shmmax=#{node[:MQ][:SHMAX]}
+    sysctl -w net.ipv4.tcp_keepalive_time=#{node[:MQ][:NET_IPV4_TCP_KEEPALIVE_TIME]}
 
     echo "# Finished udating kernel parameters ..."
   EOH
@@ -148,6 +148,19 @@ bash "install_websphere_mq" do
   EOH
 end
 
+# create queue manager
+bash "create_queue_manager" do
+
+  code <<-EOH
+
+	echo "#**********************************************************"
+	echo "# Creating Queue Manager #{node[:MQ][:QM]}			 	 "
+	echo "#**********************************************************"
+
+	echo "# Finished creating queue manager..."
+  EOH
+end
+
 # create queue manager ini file
 bash "create_queue_manager_ini_file" do
 
@@ -159,8 +172,8 @@ bash "create_queue_manager_ini_file" do
 	echo "# qm.ini file in local directory 							 "
 	echo "#**********************************************************"
 
-	rm -f $1
-	cat << EOF > $1
+	rm -f qm.ini.tmp
+	cat << EOF > qm.ini.tmp
 		#*******************************************************************#
 		#* Module Name: qm.ini                                             *#
 		#* Type       : WebSphere MQ queue manager configuration file      *#
@@ -175,7 +188,7 @@ bash "create_queue_manager_ini_file" do
 		   LogFilePages=16384
 		   LogType=CIRCULAR
 		   LogBufferPages=512
-		   LogPath=$2/$3/
+		   LogPath=#{node[:MQ][:QMGR][:LOGPATH]}/#{node[:MQ][:QM]}/
 		   LogWriteIntegrity=TripleWrite
 		Service:
 		   Name=AuthorizationService
@@ -197,16 +210,43 @@ bash "create_queue_manager_ini_file" do
 	echo "# Finished creating MQ Manager..."
 end
 
-# create queue manager
-bash "create_queue_manager" do
+# configure queue manager
+bash "configure_queue_manager" do
 
   code <<-EOH
 
 	echo "#**********************************************************"
-	echo "# Creating Queue Manager 								 	 "
+	echo "# Configuring Queue Manager #{node[:MQ][:QM]}			 	 "
 	echo "#**********************************************************"
 
-	echo "# Finished creating queue manager..."
+	echo "########### overiding default configuration for #{node[:MQ][:QM]} ###########"
+	cp qm.ini.tmp #{node[:MQ][:QMGR][:DATAPATH]}/#{node[:MQ][:QM]}/qm.ini
+
+	echo "########### staring queue manager #{node[:MQ][:QM]} ###########"
+	strmqm $1
+
+	runmqsc #{node[:MQ][:QM]} <<-EOF
+		DEFINE QLOCAL(#{node[:MQ][:REQUESTQ]}) MAXDEPTH(5000)
+		DEFINE QLOCAL(#{node[:MQ][:REQUESTQ]}) MAXDEPTH(5000)
+		ALTER QMGR CHLAUTH(DISABLED)
+		ALTER QMGR MAXMSGL(104857600)
+		ALTER CHANNEL(SYSTEM.DEF.SVRCONN) CHLTYPE(SVRCONN) MCAUSER(#{node[:MQ][:SUDO][:USER]}) MAXMSGL(104857600)
+		ALTER QLOCAL(SYSTEM.DEFAULT.LOCAL.QUEUE) MAXMSGL(104857600)
+		ALTER QMODEL(SYSTEM.DEFAULT.MODEL.QUEUE) MAXMSGL(104857600)
+		DEFINE LISTENER(L1) TRPTYPE(TCP) PORT(#{node[:MQ][:PORT]}) CONTROL(QMGR)
+		ALTER CHANNEL(SYSTEM.DEF.SVRCONN) CHLTYPE(SVRCONN) SHARECNV(1)
+		DEFINE CHANNEL(SYSTEM.ADMIN.SVRCONN) CHLTYPE(SVRCONN) MCAUSER('mqm') REPLACE
+        ALTER AUTHINFO(SYSTEM.DEFAULT.AUTHINFO.IDPWOS) AUTHTYPE(IDPWOS) CHCKCLNT(OPTIONAL)
+        ALTER QMGR CHLAUTH(DISABLED)
+        REFRESH SECURITY TYPE(CONNAUTH)
+        START LISTENER(L1)
+	EOF
+
+	 echo "########### restaring queue manager #{node[:MQ][:QM]} ###########"
+	 endmqm -i #{node[:MQ][:QM]}
+	 strmqm #{node[:MQ][:QM]}
+
+	echo "# Finished configuring queue manager..."
   EOH
 end
 
