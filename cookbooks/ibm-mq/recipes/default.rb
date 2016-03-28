@@ -22,6 +22,10 @@ user node[:MQ][:USER][:NAME] do
   	shell '/bin/bash'
 end
 
+ENV['LD_LIBRARY_PATH'] = "#{node[:MQ][:WMQ_INSTALL_DIR]}/java/lib64"
+ENV['JAVA_HOME'] = "#{node[:MQ][:WMQ_INSTALL_DIR]}/java/jre64/jre"
+ENV['PATH'] = "#{ENV['PATH']}:#{node[:MQ][:WMQ_INSTALL_DIR]}/bin:#{ENV['JAVA_HOME']}/bin"
+
 # prep mq environment
 bash "prepare_mq_environment" do
 
@@ -31,10 +35,12 @@ bash "prepare_mq_environment" do
 	echo "# Preparing MQ Environment 								 "
 	echo "#**********************************************************"
 
-	export LD_LIBRARY_PATH="#{node[:MQ][:WMQ_INSTALL_DIR]}/java/lib64"
-	export JAVA_HOME="#{node[:MQ][:WMQ_INSTALL_DIR]}/java/jre64/jre"
-	export PATH="#{ENV['PATH']}:#{node[:MQ][:WMQ_INSTALL_DIR]}/bin:#{ENV['JAVA_HOME']}/bin"
-	
+	echo "#**********************************************************"
+	echo $LD_LIBRARY_PATH	
+    echo $JAVA_HOME
+    echo $PATH
+	echo "#**********************************************************"
+
 	echo "# Finished exporting variables..."
 EOH
 end
@@ -138,10 +144,10 @@ bash "install_websphere_mq" do
 	rpm --prefix #{node[:MQ][:WMQ_INSTALL_DIR]} -ivh MQSeriesRuntime-*.rpm MQSeriesServer-*.rpm MQSeriesClient-*.rpm MQSeriesSDK-*.rpm  MQSeriesMan-*.rpm MQSeriesSamples-*.rpm MQSeriesJRE-*.rpm MQSeriesExplorer-*.rpm MQSeriesJava-*.rpm
 
 	# Define this as a primary installation
-	#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/setmqinst -i -p #{node[:MQ][:WMQ_INSTALL_DIR]}
+	setmqinst -i -p #{node[:MQ][:WMQ_INSTALL_DIR]}
 
 	# Show the version of WMQ that we just installed
-	#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/dspmqver
+	dspmqver
 
     echo "# Finished installing  WebSphere MQ 8.0 Developers Edition..."
 
@@ -166,11 +172,11 @@ bash "create_queue_manager" do
 	chmod -R g+rwx #{node[:MQ][:QMGR][:LOGPATH]}
 
 	echo "########### creating directories for queue manager #{node[:MQ][:QM]} ###########"
-	CREATE_COMMAND="#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}"
+	CREATE_COMMAND="crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}"
 	echo $CREATE_COMMAND
 
 	$CREATE_COMMAND
-	#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/strmqm -c #{node[:MQ][:QM]}
+	strmqm -c #{node[:MQ][:QM]}
 
 	echo "# Finished creating queue manager..."
 EOH
@@ -229,9 +235,9 @@ bash "configure_queue_manager" do
 	cp qm.ini.tmp #{node[:MQ][:QMGR][:DATAPATH]}/#{node[:MQ][:QM]}/qm.ini
 
 	echo "########### staring queue manager #{node[:MQ][:QM]} ###########"
-	#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/strmqm #{node[:MQ][:QM]}
+	strmqm #{node[:MQ][:QM]}
 
-	#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/runmqsc #{node[:MQ][:QM]} <<-EOF
+	runmqsc #{node[:MQ][:QM]} <<-EOF
 		DEFINE QLOCAL(#{node[:MQ][:REQUESTQ]}) MAXDEPTH(5000)
 		DEFINE QLOCAL(#{node[:MQ][:REQUESTQ]}) MAXDEPTH(5000)
 		ALTER QMGR CHLAUTH(DISABLED)
@@ -249,8 +255,8 @@ bash "configure_queue_manager" do
 EOF
 
 	 echo "########### restaring queue manager #{node[:MQ][:QM]} ###########"
-	 #{node[:MQ][:WMQ_INSTALL_DIR]}/bin/endmqm -i #{node[:MQ][:QM]}
-	 #{node[:MQ][:WMQ_INSTALL_DIR]}/bin/strmqm #{node[:MQ][:QM]}
+	 endmqm -i #{node[:MQ][:QM]}
+	 strmqm #{node[:MQ][:QM]}
 
 	echo "# Finished configuring queue manager..."
 EOH
