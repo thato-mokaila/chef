@@ -11,7 +11,7 @@ chec_solo=/usr/bin/chef-solo
 if ! type "$chec_solo" > /dev/null; then
 
 	# update system to latest
-	yum update
+	yum -y update
 
 	yum -y install gcc ruby-devel rubygems git
 
