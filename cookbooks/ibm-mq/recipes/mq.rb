@@ -32,7 +32,7 @@ bash "prepare_mq_environment" do
   code <<-EOH
 
 	echo "#**********************************************************"
-	echo "# Preparing MQ Environment 								 "
+    echo "# Environment Variables 								     "
 	echo "#**********************************************************"
 
 	echo "#**********************************************************"
@@ -172,11 +172,11 @@ bash "create_queue_manager" do
 	chmod -R g+rwx #{node[:MQ][:QMGR][:LOGPATH]}
 
 	echo "########### creating directories for queue manager #{node[:MQ][:QM]} ###########"
-	CREATE_COMMAND="crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}"
+	CREATE_COMMAND="su -c \"crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}\" mqm"
 	echo $CREATE_COMMAND
 
 	$CREATE_COMMAND
-	strmqm -c #{node[:MQ][:QM]}
+	su -c "strmqm -c #{node[:MQ][:QM]}" mqm
 
 	echo "# Finished creating queue manager..."
 EOH
@@ -235,9 +235,9 @@ bash "configure_queue_manager" do
 	cp qm.ini.tmp #{node[:MQ][:QMGR][:DATAPATH]}/#{node[:MQ][:QM]}/qm.ini
 
 	echo "########### staring queue manager #{node[:MQ][:QM]} ###########"
-	strmqm #{node[:MQ][:QM]}
+	su -c "strmqm #{node[:MQ][:QM]}" mqm
 
-	runmqsc #{node[:MQ][:QM]} <<-EOF
+	su -c "runmqsc #{node[:MQ][:QM]}" mqm <<-EOF
 		DEFINE QLOCAL(#{node[:MQ][:REQUESTQ]}) MAXDEPTH(5000)
 		DEFINE QLOCAL(#{node[:MQ][:REQUESTQ]}) MAXDEPTH(5000)
 		ALTER QMGR CHLAUTH(DISABLED)
@@ -255,8 +255,8 @@ bash "configure_queue_manager" do
 EOF
 
 	 echo "########### restaring queue manager #{node[:MQ][:QM]} ###########"
-	 endmqm -i #{node[:MQ][:QM]}
-	 strmqm #{node[:MQ][:QM]}
+	 su -c "endmqm -i #{node[:MQ][:QM]}" mqm
+	 su -c "strmqm #{node[:MQ][:QM]}" mqm
 
 	echo "# Finished configuring queue manager..."
 EOH
