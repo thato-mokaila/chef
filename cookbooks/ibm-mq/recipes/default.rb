@@ -36,7 +36,7 @@ bash "prepare_mq_environment" do
 	export PATH="#{ENV['PATH']}:#{node[:MQ][:WMQ_INSTALL_DIR]}/bin:#{ENV['JAVA_HOME']}/bin"
 	
 	echo "# Finished exporting variables..."
-  EOH
+EOH
 end
 
 # update user limits
@@ -70,7 +70,7 @@ bash "update_kernel_parameters" do
 
   code <<-EOH
 
-  	echo "#**********************************************************"
+	echo "#**********************************************************"
 	echo "# Updating Kernel Parameters 								 "
 	echo "#**********************************************************"
 
@@ -88,7 +88,7 @@ bash "update_kernel_parameters" do
     sysctl -w net.ipv4.tcp_keepalive_time=#{node[:MQ][:NET_IPV4_TCP_KEEPALIVE_TIME]}
 
     echo "# Finished udating kernel parameters ..."
-  EOH
+EOH
 end
 
 # create mq install directory
@@ -138,14 +138,14 @@ bash "install_websphere_mq" do
 	rpm --prefix #{node[:MQ][:WMQ_INSTALL_DIR]} -ivh MQSeriesRuntime-*.rpm MQSeriesServer-*.rpm MQSeriesClient-*.rpm MQSeriesSDK-*.rpm  MQSeriesMan-*.rpm MQSeriesSamples-*.rpm MQSeriesJRE-*.rpm MQSeriesExplorer-*.rpm MQSeriesJava-*.rpm
 
 	# Define this as a primary installation
-	#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/setmqinst -i -p #{node[:MQ][:WMQ_INSTALL_DIR]}
+	setmqinst -i -p #{node[:MQ][:WMQ_INSTALL_DIR]}
 
 	# Show the version of WMQ that we just installed
-	#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/dspmqver
+	dspmqver
 
     echo "# Finished installing  WebSphere MQ 8.0 Developers Edition..."
 
-  EOH
+EOH
 end
 
 # create queue manager
@@ -157,23 +157,28 @@ bash "create_queue_manager" do
 	echo "# Creating Queue Manager #{node[:MQ][:QM]}			 	 "
 	echo "#**********************************************************"
 
+	echo "########### creating directories for queue manager #{node[:MQ][:QM]} ###########"
+	echo "# will ignore the case if those directories already exist"
+	
+	mkdir #{node[:MQ][:QMGR][:DATAPATH]} | true
+	chmod -R g+rwx #{node[:MQ][:QMGR][:DATAPATH]}
+	mkdir #{node[:MQ][:QMGR][:LOGPATH]} | true
+	chmod -R g+rwx #{node[:MQ][:QMGR][:LOGPATH]}
+
+	echo "########### creating directories for queue manager #{node[:MQ][:QM]} ###########"
+	CREATE_COMMAND="crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}"
+	echo $CREATE_COMMAND
+
+	$CREATE_COMMAND
+	strmqm -c #{node[:MQ][:QM]}
+
 	echo "# Finished creating queue manager..."
-  EOH
+EOH
 end
 
 # create queue manager ini file
-bash "create_queue_manager_ini_file" do
-
-  	code <<-EOH
-
-  	echo "#**********************************************************"
-	echo "# Creating MQ Manager #{node[:MQ][:QM]}					 "
-	echo "# This function creates queue manager #{node[:MQ][:QM]}  	 "
-	echo "# qm.ini file in local directory 							 "
-	echo "#**********************************************************"
-
-	rm -f qm.ini.tmp
-	cat << EOF > qm.ini.tmp
+file 'qm.ini.tmp' do
+  content '
 		#*******************************************************************#
 		#* Module Name: qm.ini                                             *#
 		#* Type       : WebSphere MQ queue manager configuration file      *#
@@ -205,9 +210,10 @@ bash "create_queue_manager_ini_file" do
 		TuningParameters:
 		   DefaultPQBufferSize=10485760
 		   DefaultQBufferSize=10485760
-		EOF
-	EOH
-	echo "# Finished creating MQ Manager..."
+        '
+  mode '0755'
+  owner 'mqm'
+  group 'mqm'
 end
 
 # configure queue manager
@@ -223,7 +229,7 @@ bash "configure_queue_manager" do
 	cp qm.ini.tmp #{node[:MQ][:QMGR][:DATAPATH]}/#{node[:MQ][:QM]}/qm.ini
 
 	echo "########### staring queue manager #{node[:MQ][:QM]} ###########"
-	strmqm $1
+	strmqm #{node[:MQ][:QM]}
 
 	runmqsc #{node[:MQ][:QM]} <<-EOF
 		DEFINE QLOCAL(#{node[:MQ][:REQUESTQ]}) MAXDEPTH(5000)
@@ -240,14 +246,14 @@ bash "configure_queue_manager" do
         ALTER QMGR CHLAUTH(DISABLED)
         REFRESH SECURITY TYPE(CONNAUTH)
         START LISTENER(L1)
-	EOF
+EOF
 
 	 echo "########### restaring queue manager #{node[:MQ][:QM]} ###########"
 	 endmqm -i #{node[:MQ][:QM]}
 	 strmqm #{node[:MQ][:QM]}
 
 	echo "# Finished configuring queue manager..."
-  EOH
+EOH
 end
 
 # start queue manager
@@ -260,6 +266,6 @@ bash "display_complete_status" do
 	echo " SUCCESS: WMQ installation, setup and test are complete."
 	echo " To test your message queues you may want to run this script: ./mqtest.sh"
 	echo "---------------------------------------------------------------------------"
-  EOH
+EOH
 end
 
