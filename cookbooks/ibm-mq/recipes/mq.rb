@@ -125,10 +125,10 @@ bash "install_websphere_mq" do
 	echo #*****************************************************************************"
 
     echo "# installing  WebSphere MQ 8.0 Developers Edition..."
-	wget #{node[:MQ][:SOURCE][:URL]} -O #{node[:MQ][:SOURCE][:DOWNLOAD][:PATH]}/#{node[:MQ][:SOURCE][:FILENAME]}
+	#wget #{node[:MQ][:SOURCE][:URL]} -O #{node[:MQ][:SOURCE][:DOWNLOAD][:PATH]}/#{node[:MQ][:SOURCE][:FILENAME]}
 	
 	# temp
-	#cp /tmp/#{node[:MQ][:SOURCE][:FILENAME]} #{node[:MQ][:SOURCE][:DOWNLOAD][:PATH]}
+	cp /tmp/#{node[:MQ][:SOURCE][:FILENAME]} #{node[:MQ][:SOURCE][:DOWNLOAD][:PATH]}
     
     cd #{node[:MQ][:SOURCE][:DOWNLOAD][:PATH]}/wmq_install_unzipped
     tar xvf #{node[:MQ][:SOURCE][:DOWNLOAD][:PATH]}/#{node[:MQ][:SOURCE][:FILENAME]}
@@ -139,44 +139,49 @@ bash "install_websphere_mq" do
 
 	# install MQ binaries
 	rpm --prefix #{node[:MQ][:WMQ_INSTALL_DIR]} -ivh MQSeriesRuntime-*.rpm MQSeriesServer-*.rpm MQSeriesClient-*.rpm MQSeriesSDK-*.rpm  MQSeriesMan-*.rpm MQSeriesSamples-*.rpm MQSeriesJRE-*.rpm MQSeriesExplorer-*.rpm MQSeriesJava-*.rpm
-
-	# Define this as a primary installation
-	setmqinst -i -p #{node[:MQ][:WMQ_INSTALL_DIR]}
-
-	# Show the version of WMQ that we just installed
-	dspmqver
-
-    echo "# Finished installing  WebSphere MQ 8.0 Developers Edition..."
-
 EOH
 end
 
-# create queue manager
-bash "create_queue_manager" do
+# define this as a primary installation
+execute 'define_mq_primary_installation' do
+    command "strmqm -c #{node[:MQ][:QM]}"
     user 'mqm'
-    code <<-EOH
+end
 
-	echo "#**********************************************************"
-	echo "# Creating Queue Manager #{node[:MQ][:QM]}			 	 "
-	echo "#**********************************************************"
+# display mq version
+execute 'display_mq_version' do
+    command "dspmqver"
+    user 'mqm'
+end
 
-	echo "########### creating directories for queue manager #{node[:MQ][:QM]} ###########"
-	echo "# will ignore the case if those directories already exist"
-	
-	mkdir #{node[:MQ][:QMGR][:DATAPATH]} | true
-	chmod -R g+rwx #{node[:MQ][:QMGR][:DATAPATH]}
-	mkdir #{node[:MQ][:QMGR][:LOGPATH]} | true
-	chmod -R g+rwx #{node[:MQ][:QMGR][:LOGPATH]}
+# create queue manager data directories /var/mqm/DEV_QM_DATA
+directory "#{node[:MQ][:QMGR][:DATAPATH]}" do
+    owner 'mqm'
+    group 'mqm'
+    mode '0755'
+    action :create
+    ignore_failure true
+end
 
-	echo "########### creating queue manager #{node[:MQ][:QM]} ###########"
-	CREATE_COMMAND=crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}
-	echo $CREATE_COMMAND
+# create queue manager log directories /var/mqm/DEV_QM_LOG
+directory "#{node[:MQ][:QMGR][:LOGPATH]}" do
+    owner 'mqm'
+    group 'mqm'
+    mode '0755'
+    action :create
+    ignore_failure true
+end
 
-	$CREATE_COMMAND
-	strmqm -c #{node[:MQ][:QM]}
+# create queue manager
+execute 'create_queue_manager' do
+    command "crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}"
+    user 'mqm'
+end
 
-	echo "# Finished creating queue manager..."
-EOH    
+# start queue manager
+execute 'create_queue_manager' do
+    command "strmqm -c #{node[:MQ][:QM]}"
+    user 'mqm'
 end
 
 # create queue manager ini file
@@ -230,10 +235,7 @@ bash "configure_queue_manager" do
 	echo "########### overiding default configuration for #{node[:MQ][:QM]} ###########"
 	cp qm.ini.tmp #{node[:MQ][:QMGR][:DATAPATH]}/#{node[:MQ][:QM]}/qm.ini
 
-	echo "########### staring queue manager #{node[:MQ][:QM]} ###########"
-	su -c "strmqm #{node[:MQ][:QM]}" mqm
-
-	su -c "runmqsc #{node[:MQ][:QM]}" mqm <<-EOF
+	runmqsc #{node[:MQ][:QM]} <<-EOF
 		DEFINE QLOCAL(#{node[:MQ][:REQUESTQ]}) MAXDEPTH(5000)
 		DEFINE QLOCAL(#{node[:MQ][:REQUESTQ]}) MAXDEPTH(5000)
 		ALTER QMGR CHLAUTH(DISABLED)
@@ -249,17 +251,21 @@ bash "configure_queue_manager" do
         REFRESH SECURITY TYPE(CONNAUTH)
         START LISTENER(L1)
 EOF
-
-	 echo "########### restaring queue manager #{node[:MQ][:QM]} ###########"
-	 su -c "endmqm -i #{node[:MQ][:QM]}" mqm
-	 su -c "strmqm #{node[:MQ][:QM]}" mqm
-
 	echo "# Finished configuring queue manager..."
 EOH
 end
 
-# start queue manager
+# stop queue manager
+execute 'create_queue_manager' do
+    command "endmqm -i #{node[:MQ][:QM]}"
+    user 'mqm'
+end
 
+# start queue manager
+execute 'create_queue_manager' do
+    command "strmqm -c #{node[:MQ][:QM]}"
+    user 'mqm'
+end
 
 # complete
 bash "display_complete_status" do
