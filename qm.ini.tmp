@@ -1,0 +1,31 @@
+#*******************************************************************#
+#* Module Name: qm.ini                                             *#
+#* Type       : WebSphere MQ queue manager configuration file      *#
+#  Function   : Define the configuration of a single queue manager *#
+#*******************************************************************#
+ExitPath:
+   ExitsDefaultPath=/var/mqm/exits
+   ExitsDefaultPath64=/var/mqm/exits64
+Log:
+   LogPrimaryFiles=16
+   LogSecondaryFiles=16
+   LogFilePages=16384
+   LogType=CIRCULAR
+   LogBufferPages=512
+   LogPath=/var/mqm/DEV_QM_LOG/DEV_QM/
+   LogWriteIntegrity=TripleWrite
+Service:
+   Name=AuthorizationService
+   EntryPoints=14
+ServiceComponent:
+   Service=AuthorizationService
+   Name=MQSeries.UNIX.auth.service
+   Module=amqzfu
+   ComponentDataSize=0
+Channels:
+   MQIBindType=FASTPATH
+   MaxActiveChannels=5000
+   MaxChannels=5000
+TuningParameters:
+   DefaultPQBufferSize=10485760
+   DefaultQBufferSize=10485760
