@@ -28,8 +28,7 @@ ENV['PATH'] = "#{ENV['PATH']}:#{node[:MQ][:WMQ_INSTALL_DIR]}/bin:#{ENV['JAVA_HOM
 
 # prep mq environment
 bash "prepare_mq_environment" do
-
-  code <<-EOH
+    code <<-EOH
 
 	echo "#**********************************************************"
     echo "# Environment Variables 								     "
@@ -47,35 +46,33 @@ end
 
 # update user limits
 file "/etc/security/limits.d/#{node[:MQ][:USER][:NAME]}.conf" do
-  content "
-	#{node[:MQ][:USER][:NAME]} soft nofile #{node[:MQ][:FDMAX]}
-	#{node[:MQ][:USER][:NAME]} hard nofile #{node[:MQ][:FDMAX]}
-	#{node[:MQ][:USER][:NAME]} soft nproc #{node[:MQ][:FDMAX]}
-	#{node[:MQ][:USER][:NAME]} hard nproc #{node[:MQ][:FDMAX]}
-  "
-  mode '0755'
-  owner 'mqm'
-  group 'mqm'
+    content "
+        #{node[:MQ][:USER][:NAME]} soft nofile #{node[:MQ][:FDMAX]}
+        #{node[:MQ][:USER][:NAME]} hard nofile #{node[:MQ][:FDMAX]}
+        #{node[:MQ][:USER][:NAME]} soft nproc #{node[:MQ][:FDMAX]}
+        #{node[:MQ][:USER][:NAME]} hard nproc #{node[:MQ][:FDMAX]}
+      "
+    mode '0755'
+    owner 'mqm'
+    group 'mqm'
 end
 
 # update user limits [root]
 file "/etc/security/limits.d/root.conf" do
-  content "
-	root soft nofile #{node[:MQ][:FDMAX]}
-	root hard nofile #{node[:MQ][:FDMAX]}
-	root soft nproc #{node[:MQ][:FDMAX]}
-	root hard nproc #{node[:MQ][:FDMAX]}
-  "
-  mode '0755'
-  owner 'root'
-  group 'root'
+    content "
+        root soft nofile #{node[:MQ][:FDMAX]}
+        root hard nofile #{node[:MQ][:FDMAX]}
+        root soft nproc #{node[:MQ][:FDMAX]}
+        root hard nproc #{node[:MQ][:FDMAX]}
+      "
+    mode '0755'
+    owner 'root'
+    group 'root'
 end
 
 # update kernel parameters
 bash "update_kernel_parameters" do
-
-  code <<-EOH
-
+    code <<-EOH
 	echo "#**********************************************************"
 	echo "# Updating Kernel Parameters 								 "
 	echo "#**********************************************************"
@@ -107,7 +104,7 @@ end
 
 # install websphere mq
 bash "install_websphere_mq" do
-  code <<-EOH
+    code <<-EOH
 
 	echo #*****************************************************************************"
 	echo " Installation Summary "
@@ -156,8 +153,8 @@ end
 
 # create queue manager
 bash "create_queue_manager" do
-
-  code <<-EOH
+    user 'mqm'
+    code <<-EOH
 
 	echo "#**********************************************************"
 	echo "# Creating Queue Manager #{node[:MQ][:QM]}			 	 "
@@ -171,20 +168,20 @@ bash "create_queue_manager" do
 	mkdir #{node[:MQ][:QMGR][:LOGPATH]} | true
 	chmod -R g+rwx #{node[:MQ][:QMGR][:LOGPATH]}
 
-	echo "########### creating directories for queue manager #{node[:MQ][:QM]} ###########"
-	CREATE_COMMAND="su -c \"crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}\" mqm"
+	echo "########### creating queue manager #{node[:MQ][:QM]} ###########"
+	CREATE_COMMAND=crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}
 	echo $CREATE_COMMAND
 
 	$CREATE_COMMAND
-	su -c "strmqm -c #{node[:MQ][:QM]}" mqm
+	strmqm -c #{node[:MQ][:QM]}
 
 	echo "# Finished creating queue manager..."
-EOH
+EOH    
 end
 
 # create queue manager ini file
 file 'qm.ini.tmp' do
-  content '
+    content '
 		#*******************************************************************#
 		#* Module Name: qm.ini                                             *#
 		#* Type       : WebSphere MQ queue manager configuration file      *#
@@ -217,15 +214,14 @@ file 'qm.ini.tmp' do
 		   DefaultPQBufferSize=10485760
 		   DefaultQBufferSize=10485760
         '
-  mode '0755'
-  owner 'mqm'
-  group 'mqm'
+    mode '0755'
+    owner 'mqm'
+    group 'mqm'
 end
 
 # configure queue manager
 bash "configure_queue_manager" do
-
-  code <<-EOH
+    code <<-EOH
 
 	echo "#**********************************************************"
 	echo "# Configuring Queue Manager #{node[:MQ][:QM]}			 	 "
@@ -267,7 +263,7 @@ end
 
 # complete
 bash "display_complete_status" do
-  code <<-EOH
+    code <<-EOH
 	echo "---------------------------------------------------------------------------"
 	echo " SUCCESS: WMQ installation, setup and test are complete."
 	echo " To test your message queues you may want to run this script: ./mqtest.sh"
