@@ -179,7 +179,7 @@ execute 'create_queue_manager' do
 end
 
 # start queue manager
-execute 'create_queue_manager' do
+execute 'start_queue_manager' do
     command "strmqm -c #{node[:MQ][:QM]}"
     user 'mqm'
 end
@@ -256,13 +256,13 @@ EOH
 end
 
 # stop queue manager
-execute 'create_queue_manager' do
+execute 'stop_queue_manager' do
     command "endmqm -i #{node[:MQ][:QM]}"
     user 'mqm'
 end
 
 # start queue manager
-execute 'create_queue_manager' do
+execute 'start_queue_manager' do
     command "strmqm -c #{node[:MQ][:QM]}"
     user 'mqm'
 end
