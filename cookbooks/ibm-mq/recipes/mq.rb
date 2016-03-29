@@ -138,13 +138,13 @@ end
 # define this as a primary installation
 execute 'define_mq_primary_installation' do
     command "strmqm -c #{node[:MQ][:QM]}"
-    user 'mqm'
+    user 'root'
 end
 
 # display mq version
 execute 'display_mq_version' do
     command "dspmqver"
-    user 'mqm'
+    user 'root'
 end
 
 # create queue manager data directories /var/mqm/DEV_QM_DATA
@@ -168,13 +168,13 @@ end
 # create queue manager
 execute 'create_queue_manager' do
     command "crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}"
-    user 'mqm'
+    user 'root'
 end
 
 # start queue manager
 execute 'start_queue_manager' do
     command "strmqm -c #{node[:MQ][:QM]}"
-    user 'mqm'
+    user 'root'
 end
 
 # modify qm.ini.tmp group and permissions
@@ -200,13 +200,13 @@ end
 # stop queue manager
 execute 'stop_queue_manager' do
     command "endmqm -i #{node[:MQ][:QM]}"
-    user 'mqm'
+    user 'root'
 end
 
 # start queue manager
 execute 'start_queue_manager' do
     command "strmqm -c #{node[:MQ][:QM]}"
-    user 'mqm'
+    user 'root'
 end
 
 # complete
