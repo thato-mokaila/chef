@@ -26,11 +26,11 @@ cd /var && mkdir -p /tmp/mq_install/scripts
 # check out cookbooks into working directory
 git clone https://github.com/thato-mokaila/chef.git
 chmod -R 755 ./chef && cd ./chef/ 
-cp -r ./scripts/mq/ /tmp/mq_install/scripts
-cp ./scripts/mq/functions.sh /usr/local/sbin
-cp ./scripts/mq/mqconfig.sh /usr/local/sbin
-cp ./qm.ini.tmp /tmp/mq_install
-cp ./config.mqsc /tmp/mq_install
+cp -r ./mq/scripts/ /tmp/mq_install/scripts
+cp ./mq/scripts/functions.sh /usr/local/sbin
+cp ./mq/scripts/mqconfig.sh /usr/local/sbin
+cp ./mq/config/qm.ini.tmp /tmp/mq_install
+cp ./mq/config/config.mqsc /tmp/mq_install
 
 # run chef to prep the system
 "$chec_solo" -c solo.rb -j node.json
