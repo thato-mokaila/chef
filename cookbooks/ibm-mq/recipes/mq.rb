@@ -35,12 +35,14 @@ bash "prepare_mq_environment" do
 	echo "#**********************************************************"
 
 	echo "#**********************************************************"
-	echo $LD_LIBRARY_PATH	
-    echo $JAVA_HOME
-    echo $PATH
+    export LD_LIBRARY_PATH=#{node[:MQ][:WMQ_INSTALL_DIR]}/java/lib64
+    export JAVA_HOME=#{node[:MQ][:WMQ_INSTALL_DIR]}/java/jre64/jre
+    export PATH=#{ENV['PATH']}:#{node[:MQ][:WMQ_INSTALL_DIR]}/bin:#{ENV['JAVA_HOME']}/bin
 	echo "#**********************************************************"
 
+    usermod --groups mqm root
 	echo "# Finished exporting variables..."
+    
 EOH
 end
 
@@ -168,12 +170,6 @@ end
 # create queue manager
 execute 'create_queue_manager' do
     command "crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}"
-    user 'root'
-end
-
-# start queue manager
-execute 'start_queue_manager' do
-    command "strmqm -c #{node[:MQ][:QM]}"
     user 'root'
 end
 
