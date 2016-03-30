@@ -158,6 +158,12 @@ directory "#{node[:MQ][:QMGR][:DATAPATH]}" do
     ignore_failure true
 end
 
+reboot 'reboot_machine' do
+  action :nothing
+  reason 'Cannot continue Chef run without a reboot.'
+  delay_mins 1
+end
+
 # create queue manager log directories /var/mqm/DEV_QM_LOG
 directory "#{node[:MQ][:QMGR][:LOGPATH]}" do
     owner 'mqm'
@@ -165,6 +171,7 @@ directory "#{node[:MQ][:QMGR][:LOGPATH]}" do
     mode '0755'
     action :create
     ignore_failure true
+    notifies :reboot_now, 'reboot[reboot_machine]', :immediately
 end
 
 # create queue manager
