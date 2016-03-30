@@ -139,13 +139,13 @@ end
 
 # define this as a primary installation
 execute 'define_mq_primary_installation' do
-    command "#{node[:MQ][:WMQ_INSTALL_DIR]}/setmqinst -i -p #{node[:MQ][:WMQ_INSTALL_DIR]}"
+    command "#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/setmqinst -i -p #{node[:MQ][:WMQ_INSTALL_DIR]}"
     user 'root'
 end
 
 # display mq version
 execute 'display_mq_version' do
-    command "#{node[:MQ][:WMQ_INSTALL_DIR]}/dspmqver"
+    command "#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/dspmqver"
     user 'root'
 end
 
