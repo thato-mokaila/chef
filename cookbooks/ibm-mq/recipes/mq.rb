@@ -30,7 +30,7 @@ user node[:MQ][:USER][:NAME] do
 end
 
 # add root to mqm before any sub-processes
-group 'node[:MQ][:USER][:GROUP]' do
+group node[:MQ][:USER][:GROUP] do
   action :modify
   members 'root'
   append true
@@ -184,13 +184,13 @@ end
 # create queue manager
 execute 'create_queue_manager' do
     command "crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}"
-    user 'root'
+    user 'mqm'
 end
 
 # start queue manager
 execute 'start_queue_manager' do
     command "strmqm -c #{node[:MQ][:QM]}"
-    user 'root'
+    user 'mqm'
 end
 
 # modify qm.ini.tmp group and permissions
@@ -210,19 +210,19 @@ end
 # configure queue manager
 execute 'configure_queue_manager' do
     command "runmqsc #{node[:MQ][:QM]} < /tmp/mq_install/config.mqsc"
-    user 'root'
+    user 'mqm'
 end
 
 # stop queue manager
 execute 'stop_queue_manager' do
     command "endmqm -i #{node[:MQ][:QM]}"
-    user 'root'
+    user 'mqm'
 end
 
 # start queue manager
 execute 'start_queue_manager' do
     command "strmqm -c #{node[:MQ][:QM]}"
-    user 'root'
+    user 'mqm'
 end
 
 # complete
