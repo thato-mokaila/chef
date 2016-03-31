@@ -184,45 +184,49 @@ end
 # create queue manager
 execute 'create_queue_manager' do
     command "crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}"
-    user 'mqm'
+    user 'root'
 end
 
 # start queue manager
-execute 'start_queue_manager' do
-    command "strmqm -c #{node[:MQ][:QM]}"
-    user 'mqm'
+bash "start_queue_manager" do
+code <<-EOL
+  strmqm -c #{node[:MQ][:QM]}
+EOL
 end
 
 # modify qm.ini.tmp group and permissions
 bash "modify_mq_ini_file" do
 code <<-EOL
-  chown mqm:mqm /tmp/mq_install/qm.ini.tmp
+    chown mqm:mqm /tmp/mq_install/qm.ini.tmp
 EOL
 end
 
 # overiding default configuration
 bash "overiding_default_configuration" do
 code <<-EOL
-  cp qm.ini.tmp #{node[:MQ][:QMGR][:DATAPATH]}/#{node[:MQ][:QM]}/qm.ini
+    cp qm.ini.tmp #{node[:MQ][:QMGR][:DATAPATH]}/#{node[:MQ][:QM]}/qm.ini
 EOL
 end
 
 # configure queue manager
-execute 'configure_queue_manager' do
-    command "runmqsc #{node[:MQ][:QM]} < /tmp/mq_install/config.mqsc"
-    user 'mqm'
+bash "configure_queue_manager" do
+code <<-EOL
+    runmqsc #{node[:MQ][:QM]} < /tmp/mq_install/config.mqsc
+EOL
 end
 
 # stop queue manager
-execute 'stop_queue_manager' do
-    command "endmqm -i #{node[:MQ][:QM]}"
-    user 'mqm'
+bash "stop_queue_manager" do
+code <<-EOL
+    endmqm -i #{node[:MQ][:QM]}
+EOL
 end
 
 # start queue manager
-execute 'start_queue_manager' do
-    command "strmqm -c #{node[:MQ][:QM]}"
-    user 'mqm'
+bash "start_queue_manager" do
+code <<-EOL
+    strmqm -c #{node[:MQ][:QM]}
+EOL
 end
 
 # complete
