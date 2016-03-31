@@ -191,7 +191,7 @@ end
 # start queue manager
 bash "start_queue_manager" do
 code <<-EOL
-    su -c "strmqm -c #{node[:MQ][:QM]}" mwm
+    su -c "strmqm -c #{node[:MQ][:QM]}" mqm
 EOL
 end
 
