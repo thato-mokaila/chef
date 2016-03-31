@@ -182,9 +182,10 @@ directory "#{node[:MQ][:QMGR][:LOGPATH]}" do
 end
 
 # create queue manager
-execute 'create_queue_manager' do
-    command "crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}"
-    user 'root'
+bash "create_queue_manager" do
+code <<-EOL
+    crtmqm -q -u SYSTEM.DEAD.LETTER.QUEUE -h #{node[:MQ][:MAX_HANDLES]} -lc -ld #{node[:MQ][:QMGR][:LOGPATH]} -lf #{node[:MQ][:LOG_FILE_PAGES]} -lp #{node[:MQ][:LOG_PRIMARY_FILES]} -md #{node[:MQ][:QMGR][:DATAPATH]} #{node[:MQ][:QM]}
+EOL
 end
 
 # start queue manager
