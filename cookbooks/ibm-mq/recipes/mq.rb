@@ -29,6 +29,13 @@ user node[:MQ][:USER][:NAME] do
   	shell '/bin/bash'
 end
 
+# add root to mqm before any sub-processes
+group 'node[:MQ][:USER][:GROUP]' do
+  action :modify
+  members 'root'
+  append true
+end
+
 ENV['LD_LIBRARY_PATH'] = "#{node[:MQ][:WMQ_INSTALL_DIR]}/java/lib64"
 ENV['JAVA_HOME'] = "#{node[:MQ][:WMQ_INSTALL_DIR]}/java/jre64/jre"
 ENV['PATH'] = "#{ENV['PATH']}:#{node[:MQ][:WMQ_INSTALL_DIR]}/bin:#{ENV['JAVA_HOME']}/bin"
@@ -47,7 +54,6 @@ bash "prepare_mq_environment" do
     export PATH=#{ENV['PATH']}:#{node[:MQ][:WMQ_INSTALL_DIR]}/bin:#{ENV['JAVA_HOME']}/bin
 	echo "#**********************************************************"
 
-    usermod --groups mqm root
 	echo "# Finished exporting variables..."
     
 EOH
@@ -142,14 +148,12 @@ cd #{node[:MQ][:MQ_EXLPODED_DIR]}
 # install MQ binaries
 rpm --prefix #{node[:MQ][:WMQ_INSTALL_DIR]} -ivh MQSeriesRuntime-*.rpm MQSeriesServer-*.rpm MQSeriesClient-*.rpm MQSeriesSDK-*.rpm  MQSeriesMan-*.rpm MQSeriesSamples-*.rpm MQSeriesJRE-*.rpm MQSeriesExplorer-*.rpm MQSeriesJava-*.rpm
 EOH
-    notifies :run, 'execute[define_mq_primary_installation]', :immediately
 end
 
 # define this as a primary installation
 execute 'define_mq_primary_installation' do
     command "#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/setmqinst -i -p #{node[:MQ][:WMQ_INSTALL_DIR]}"
     user 'root'
-    notifies :run, 'execute[display_mq_version]', :immediately
 end
 
 # display mq version
