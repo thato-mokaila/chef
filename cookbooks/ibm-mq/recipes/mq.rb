@@ -205,7 +205,7 @@ end
 # overiding default configuration
 bash "overiding_default_configuration" do
 code <<-EOL
-    cp qm.ini.tmp #{node[:MQ][:QMGR][:DATAPATH]}/#{node[:MQ][:QM]}/qm.ini
+    yes | cp /tmp/mq_install/qm.ini.tmp #{node[:MQ][:QMGR][:DATAPATH]}/#{node[:MQ][:QM]}/qm.ini
 EOL
 end
 

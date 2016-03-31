@@ -22,8 +22,8 @@ cd /var
 # check out cookbooks into working directory
 git clone https://github.com/thato-mokaila/chef.git
 chmod -R 755 ./chef && cd ./chef/ 
-cp ./chef/mq/config/qm.ini.tmp /tmp/mq_install
-cp ./chef/mq/config/config.mqsc /tmp/mq_install
+cp ./chef/mq/qm.ini.tmp /tmp/mq_install
+cp ./chef/mq/config.mqsc /tmp/mq_install
 
 # run chef to prep the system
 "$chec_solo" -c solo.rb -j node.json
