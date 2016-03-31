@@ -10,6 +10,13 @@
 #Chef::Log.debug "Output: #{ output.stdout }"
 #Chef::Recipe.send(:include, MQCookbook::Helper)
 
+# rebbot node
+reboot 'reboot_machine' do
+  action :nothing
+  reason 'Cannot continue Chef run without a reboot.'
+  delay_mins 1
+end
+
 # create group 'mqm'
 group node[:MQ][:USER][:GROUP]
 
@@ -135,12 +142,14 @@ cd #{node[:MQ][:MQ_EXLPODED_DIR]}
 # install MQ binaries
 rpm --prefix #{node[:MQ][:WMQ_INSTALL_DIR]} -ivh MQSeriesRuntime-*.rpm MQSeriesServer-*.rpm MQSeriesClient-*.rpm MQSeriesSDK-*.rpm  MQSeriesMan-*.rpm MQSeriesSamples-*.rpm MQSeriesJRE-*.rpm MQSeriesExplorer-*.rpm MQSeriesJava-*.rpm
 EOH
+    notifies :run, 'execute[define_mq_primary_installation]', :immediately
 end
 
 # define this as a primary installation
 execute 'define_mq_primary_installation' do
     command "#{node[:MQ][:WMQ_INSTALL_DIR]}/bin/setmqinst -i -p #{node[:MQ][:WMQ_INSTALL_DIR]}"
     user 'root'
+    notifies :run, 'execute[display_mq_version]', :immediately
 end
 
 # display mq version
@@ -158,12 +167,6 @@ directory "#{node[:MQ][:QMGR][:DATAPATH]}" do
     ignore_failure true
 end
 
-reboot 'reboot_machine' do
-  action :nothing
-  reason 'Cannot continue Chef run without a reboot.'
-  delay_mins 1
-end
-
 # create queue manager log directories /var/mqm/DEV_QM_LOG
 directory "#{node[:MQ][:QMGR][:LOGPATH]}" do
     owner 'mqm'
@@ -171,7 +174,7 @@ directory "#{node[:MQ][:QMGR][:LOGPATH]}" do
     mode '0755'
     action :create
     ignore_failure true
-    notifies :reboot_now, 'reboot[reboot_machine]', :immediately
+    #notifies :reboot_now, 'reboot[reboot_machine]', :immediately
 end
 
 # create queue manager
