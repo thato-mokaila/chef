@@ -191,7 +191,7 @@ end
 # start queue manager
 bash "start_queue_manager" do
 code <<-EOL
-  strmqm -c #{node[:MQ][:QM]}
+    su -c "strmqm -c #{node[:MQ][:QM]}" mwm
 EOL
 end
 
@@ -212,21 +212,21 @@ end
 # configure queue manager
 bash "configure_queue_manager" do
 code <<-EOL
-    runmqsc #{node[:MQ][:QM]} < /tmp/mq_install/config.mqsc
+    su -c "runmqsc #{node[:MQ][:QM]} < /tmp/mq_install/config.mqsc" mqm
 EOL
 end
 
 # stop queue manager
 bash "stop_queue_manager" do
 code <<-EOL
-    endmqm -i #{node[:MQ][:QM]}
+    su -c "endmqm -i #{node[:MQ][:QM]}" mqm
 EOL
 end
 
 # start queue manager
 bash "start_queue_manager" do
 code <<-EOL
-    strmqm -c #{node[:MQ][:QM]}
+    su -c "strmqm -c #{node[:MQ][:QM]}" mqm
 EOL
 end
 
