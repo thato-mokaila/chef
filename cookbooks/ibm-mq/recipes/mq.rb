@@ -209,6 +209,13 @@ code <<-EOL
 EOL
 end
 
+# start queue manager
+bash "start_queue_manager" do
+code <<-EOL
+    su -c "strmqm #{node[:MQ][:QM]}" mqm
+EOL
+end
+
 # configure queue manager
 bash "configure_queue_manager" do
 code <<-EOL
@@ -226,7 +233,7 @@ end
 # start queue manager
 bash "start_queue_manager" do
 code <<-EOL
-    su -c "strmqm -c #{node[:MQ][:QM]}" mqm
+    su -c "strmqm #{node[:MQ][:QM]}" mqm
 EOL
 end
 
