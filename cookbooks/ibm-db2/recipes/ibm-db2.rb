@@ -15,7 +15,11 @@ bash "install_db2_using_response_file" do
     echo "# installing DB2 Express C v10.5 ...					     "
 	echo "#**********************************************************"
 
-./db2setup.sh -r /tmp/db2_install/db2-express.rsp
+cd /tmp/db2_install/
+tar -xvzf ./v10.5_linuxx64_expc.tar.gz
+chmod -R 755 /tmp/db2_install
+cd expc/
+./db2setup -r /tmp/db2_install/db2-express.rsp
     
 EOH
 end
