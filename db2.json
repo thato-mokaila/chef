@@ -1,6 +1,6 @@
 {
 	"db2":{
-		"version":"8.0.0.4"
+		"version":"10.5"
 	},
     "run_list": ["ibm-db2::ibm-db2"]
 }
