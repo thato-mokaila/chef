@@ -8,7 +8,7 @@
 #
 #!/bin/bash
 
-log "  Configure DB2 Install Response file - /tmp/db2.rsp"
+log "  Install DB2"
 bash "install_db2_using_response_file" do
     code <<-EOH
 
@@ -25,6 +25,7 @@ tar -xvzf ./v10.5_linuxx64_expc.tar.gz
 chmod -R 755 /tmp/db2_install
 cd /tmp/db2_install/expc/
 
+./db2setup -r /tmp/db2_install/db2-express.rsp
 /opt/ibm/db2/V10.5/instance/db2icrt -p 50000 -u db2fenc1 db2inst1
 echo "db2inst1" | passwd db2inst1 --stdin
 
@@ -32,4 +33,13 @@ su - db2inst1
 db2start
     
 EOH
+end
+
+log "  Configure Java"
+bash "setup-ibm-java" do
+code <<-EOH
+    update-alternatives --install "/usr/bin/java" "java" "/opt/ibm/db2/V10.5/java/jdk64/jre/bin/java" 0
+    update-alternatives --set "java" "/opt/ibm/db2/V10.5/java/jdk64/jre/bin/java"
+EOH
+action :nothing
 end
