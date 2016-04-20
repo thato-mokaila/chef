@@ -7,9 +7,16 @@
 # All rights reserved - Do Not Redistribute
 #
 
+# #####################################
+# #####################################
+
 # create group 'db2admin'
 group 'db2admin'
 group 'db2fsdm1'
+group 'db2inst1'
+
+# #####################################
+# #####################################
 
 # add db2sdfe1 user
 user 'db2fsdm1' do
@@ -29,6 +36,18 @@ user 'db2admin' do
   	shell '/bin/bash'
 end
 
+# add db2inst1 user
+user 'db2inst1' do
+    comment 'A user required to run DB2'
+  	group 'db2inst1'
+    home '/home/db2inst1'
+  	system true
+  	shell '/bin/bash'
+end
+
+# #####################################
+# #####################################
+
 # create mq install directory
 directory "/home/db2fsdm1" do
   owner 'db2fsdm1'
@@ -41,6 +60,14 @@ end
 directory "/home/db2admin" do
   owner 'db2admin'
   group 'db2admin'
+  mode '0755'
+  action :create
+end
+
+# create mq install directory
+directory "/home/db2inst1" do
+  owner 'db2inst1'
+  group 'db2inst1'
   mode '0755'
   action :create
 end
