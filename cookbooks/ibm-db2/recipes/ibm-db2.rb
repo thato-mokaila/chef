@@ -8,13 +8,13 @@
 #
 
 # create group 'db2sdfe1'
-group db2sdfe1
+group 'db2sdfe1'
 
 # create group 'db2admin'
-group db2admin
+group 'db2admin'
 
 # add db2sdfe1 user
-user db2sdfe1 do
+user 'db2sdfe1' do
     comment 'A user required to run DB2'
   	group 'db2sdfe1'
     home '/home/db2sdfe1'
@@ -23,7 +23,7 @@ user db2sdfe1 do
 end
 
 # add db2admin user
-user db2admin do
+user 'db2admin' do
     comment 'A user required to run DB2'
   	group 'db2admin'
     home '/home/db2admin'
