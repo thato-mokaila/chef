@@ -42,24 +42,25 @@ COMP                      = DB2_SAMPLE_DATABASE
 ** --------------------------
 INSTANCE                  = DB2_INST
 DB2_INST.NAME             = db2inst1
-DB2_INST.GROUP_NAME       = db2inst1
+DB2_INST.GROUP_NAME       = db2iadm1
 DB2_INST.HOME_DIRECTORY   = db2inst1
 DB2_INST.PASSWORD         = db2inst1
 DB2_INST.AUTOSTART        = YES
 DB2_INST.PORT_NUMBER      = 50000
+DB2_INST.AUTHENTICATION   = SERVER 
 
 ** Fenced User Creation Settings
 ** -----------------------------
-DB2_INST.FENCED_USERNAME        = db2fsdm1
-DB2_INST.FENCED_GROUP_NAME      = db2fsdm1
-DB2_INST.FENCED_HOME_DIRECTORY  = /home/db2fsdm1
-DB2_INST.FENCED_PASSWORD        = db2fsdm1
+DB2_INST.FENCED_USERNAME        = db2fenc1
+DB2_INST.FENCED_GROUP_NAME      = db2fadm1
+DB2_INST.FENCED_HOME_DIRECTORY  = /home/db2fenc1
+DB2_INST.FENCED_PASSWORD        = db2fenc1
 
 ** Administration Server Creation Settings
 ** ---------------------------------------
 
 DAS_USERNAME             = db2admin 
-DAS_GROUP_NAME           = db2admin
+DAS_GROUP_NAME           = dasadm1
 DAS_HOME_DIRECTORY       = /home/db2admin
 DAS_PASSWORD             = db2admin 
 

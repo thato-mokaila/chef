@@ -5,24 +5,33 @@
 # Copyright 2016, Elten Group (Pty) Ltd.
 #
 # All rights reserved - Do Not Redistribute
-#
+# http://www.ibm.com/support/knowledgecenter/SSEPGG_9.7.0/com.ibm.db2.luw.qb.server.doc/doc/t0007067.html
 
 # #####################################
 # #####################################
 
 # create group 'db2admin'
-group 'db2admin'
-group 'db2fsdm1'
 group 'db2inst1'
+group 'db2fenc1'
+group 'db2admin'
 
 # #####################################
 # #####################################
+
+# add db2inst1 user
+user 'db2inst1' do
+    comment 'A user required to run DB2'
+  	group 'db2iadm1'
+    home '/home/db2inst1'
+  	system true
+  	shell '/bin/bash'
+end
 
 # add db2sdfe1 user
-user 'db2fsdm1' do
+user 'db2fenc1' do
     comment 'A user required to run DB2'
-  	group 'db2fsdm1'
-    home '/home/db2fsdm1'
+  	group 'db2fadm1'
+    home '/home/db2fenc1'
   	system true
   	shell '/bin/bash'
 end
@@ -30,17 +39,8 @@ end
 # add db2admin user
 user 'db2admin' do
     comment 'A user required to run DB2'
-  	group 'db2admin'
+  	group 'dasadm1'
     home '/home/db2admin'
-  	system true
-  	shell '/bin/bash'
-end
-
-# add db2inst1 user
-user 'db2inst1' do
-    comment 'A user required to run DB2'
-  	group 'db2inst1'
-    home '/home/db2inst1'
   	system true
   	shell '/bin/bash'
 end
@@ -49,9 +49,17 @@ end
 # #####################################
 
 # create mq install directory
-directory "/home/db2fsdm1" do
-  owner 'db2fsdm1'
-  group 'db2fsdm1'
+directory "/home/db2inst1" do
+  owner 'db2inst1'
+  group 'db2iadm1'
+  mode '0755'
+  action :create
+end
+
+# create mq install directory
+directory "/home/db2fenc1" do
+  owner 'db2fenc1'
+  group 'db2fadm1'
   mode '0755'
   action :create
 end
@@ -59,15 +67,7 @@ end
 # create mq install directory
 directory "/home/db2admin" do
   owner 'db2admin'
-  group 'db2admin'
-  mode '0755'
-  action :create
-end
-
-# create mq install directory
-directory "/home/db2inst1" do
-  owner 'db2inst1'
-  group 'db2inst1'
+  group 'dasadm1'
   mode '0755'
   action :create
 end
@@ -99,6 +99,9 @@ tar -xvzf ./v10.5_linuxx64_expc.tar.gz
 chmod -R 755 /tmp/db2_install
 cd expc/
 ./db2setup -r /tmp/db2_install/db2-express.rsp
+#/opt/ibm/db2/v10.5/instance/dascrt -u db2admin
+#/opt/ibm/db2/v10.5/instance/db2icrt -a server -u db2fenc1 db2inst1
+#/opt/ibm/db2/v10.5/instance/db2ln
     
 EOH
 end
