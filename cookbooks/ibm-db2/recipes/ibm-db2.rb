@@ -13,6 +13,22 @@ group 'db2sdfe1'
 # create group 'db2admin'
 group 'db2admin'
 
+# create mq install directory
+directory "/home/db2sdfe1" do
+  owner 'db2sdfe1'
+  group 'db2sdfe1'
+  mode '0755'
+  action :create
+end
+
+# create mq install directory
+directory "/home/db2admin" do
+  owner 'db2admin'
+  group 'db2admin'
+  mode '0755'
+  action :create
+end
+
 # add db2sdfe1 user
 user 'db2sdfe1' do
     comment 'A user required to run DB2'
