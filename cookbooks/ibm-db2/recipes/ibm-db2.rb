@@ -97,9 +97,10 @@ export PATH=/opt/ibm/db2/V10.5/bin/:$PATH
 cd /tmp/db2_install/
 tar -xvzf ./v10.5_linuxx64_expc.tar.gz
 chmod -R 755 /tmp/db2_install
-cd expc/
-./db2setup -r /tmp/db2_install/db2-express.rsp
-su -c "/opt/ibm/db2/V10.5/bin/db2sampl" db2admin
+cd /tmp/db2_install/expc/
+
+#./db2setup -r /tmp/db2_install/db2-express.rsp
+#su -c "/opt/ibm/db2/V10.5/bin/db2sampl" db2admin
 
 #/opt/ibm/db2/v10.5/instance/dascrt -u db2admin
 #/opt/ibm/db2/v10.5/instance/db2icrt -a server -u db2fenc1 db2inst1
