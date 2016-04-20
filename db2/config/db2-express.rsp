@@ -27,9 +27,10 @@
 ** http://publib.boulder.ibm.com/infocenter/db2luw/v10r5
 **
 ** ============================================================================
+
+
 ** General Options
 ** ---------------
-
 PROD                      = EXPRESS_C
 FILE                      = /opt/ibm/db2/V10.5
 LIC_AGREEMENT             = ACCEPT
@@ -41,9 +42,9 @@ COMP                      = DB2_SAMPLE_DATABASE
 ** --------------------------
 INSTANCE                  = DB2_INST
 DB2_INST.NAME             = db2inst1
-DB2_INST.GROUP_NAME       = db2admin
-DB2_INST.HOME_DIRECTORY   = db2admin
-DB2_INST.PASSWORD         = db2admin
+DB2_INST.GROUP_NAME       = db2inst1
+DB2_INST.HOME_DIRECTORY   = db2inst1
+DB2_INST.PASSWORD         = db2inst1
 DB2_INST.AUTOSTART        = YES
 DB2_INST.PORT_NUMBER      = 50000
 

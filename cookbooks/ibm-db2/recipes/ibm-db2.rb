@@ -7,9 +7,6 @@
 # All rights reserved - Do Not Redistribute
 #
 
-# create group 'db2sdfe1'
-#group 'db2fsdm1'
-
 # create group 'db2admin'
 group 'db2admin'
 group 'db2fsdm1'
