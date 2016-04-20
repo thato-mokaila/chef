@@ -7,6 +7,16 @@
 # All rights reserved - Do Not Redistribute
 # http://www.ibm.com/support/knowledgecenter/SSEPGG_9.7.0/com.ibm.db2.luw.qb.server.doc/doc/t0007067.html
 
+# 1. Set up users and groups
+# 2. Create a DB2 Administration Server
+# 3. Create a DB2 instance
+# 4. Create links to DB2 files
+# 5. Configure TCP/IP communication
+# 6. Configure services file
+# 7. Update database manager
+# 8. Set communications protocols
+# 9. Apply license (already done, verifiable by db2licm -l)
+
 # #####################################
 # #####################################
 
@@ -85,7 +95,7 @@ sysctl -w kernel.shmmax=17179869184
 EOH
 end
 
-# install db2
+log "  Configure DB2 Install Response file - /tmp/db2.rsp"
 bash "install_db2_using_response_file" do
     code <<-EOH
 
@@ -107,4 +117,13 @@ cd /tmp/db2_install/expc/
 #/opt/ibm/db2/v10.5/instance/db2ln
     
 EOH
+end
+
+log "  Configure DB2 Install Response file - /tmp/db2.rsp"
+bash "setup-ibm-java" do
+code <<-EOH
+    update-alternatives --install "/usr/bin/java" "java" "/opt/ibm/db2/V10.5/java/jdk64/jre/bin/java" 0
+    update-alternatives --set "java" "/opt/ibm/db2/V10.5/java/jdk64/jre/bin/java"
+EOH
+action :nothing
 end
