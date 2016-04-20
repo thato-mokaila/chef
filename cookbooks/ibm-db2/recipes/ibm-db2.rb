@@ -8,10 +8,11 @@
 #
 
 # create group 'db2sdfe1'
-group 'db2fsdm1'
+#group 'db2fsdm1'
 
 # create group 'db2admin'
 group 'db2admin'
+group 'db2fsdm1'
 
 # add db2sdfe1 user
 user 'db2fsdm1' do
@@ -67,6 +68,7 @@ bash "install_db2_using_response_file" do
 echo "#**********************************************************"
 echo "# installing DB2 Express C v10.5 ...					     "
 echo "#**********************************************************"
+export PATH=/opt/ibm/db2/V10.5/bin/:$PATH 
 
 cd /tmp/db2_install/
 tar -xvzf ./v10.5_linuxx64_expc.tar.gz
