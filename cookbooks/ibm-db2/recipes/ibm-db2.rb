@@ -8,16 +8,16 @@
 #
 
 # create group 'db2sdfe1'
-group 'db2sdfe1'
+group 'db2fsdm1'
 
 # create group 'db2admin'
 group 'db2admin'
 
 # add db2sdfe1 user
-user 'db2sdfe1' do
+user 'db2fsdm1' do
     comment 'A user required to run DB2'
-  	group 'db2sdfe1'
-    home '/home/db2sdfe1'
+  	group 'db2fsdm1'
+    home '/home/db2fsdm1'
   	system true
   	shell '/bin/bash'
 end
@@ -32,9 +32,9 @@ user 'db2admin' do
 end
 
 # create mq install directory
-directory "/home/db2sdfe1" do
-  owner 'db2sdfe1'
-  group 'db2sdfe1'
+directory "/home/db2fsdm1" do
+  owner 'db2fsdm1'
+  group 'db2fsdm1'
   mode '0755'
   action :create
 end
