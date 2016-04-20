@@ -11,9 +11,9 @@
 # #####################################
 
 # create group 'db2admin'
-group 'db2inst1'
-group 'db2fenc1'
-group 'db2admin'
+group 'db2iadm1'
+group 'db2fadm1'
+group 'dasadm1'
 
 # #####################################
 # #####################################
