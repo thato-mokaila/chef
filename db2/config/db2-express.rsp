@@ -60,7 +60,7 @@ DB2_INST.FENCED_PASSWORD        = db2fenc1
 ** ---------------------------------------
 
 DAS_USERNAME             = db2admin 
-DAS_GROUP_NAME           = dasadm1
+DAS_GROUP_NAME           = db2iadm1
 DAS_HOME_DIRECTORY       = /home/db2admin
 DAS_PASSWORD             = db2admin 
 
