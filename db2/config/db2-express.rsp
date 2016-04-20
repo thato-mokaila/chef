@@ -228,10 +228,10 @@ DB2_INST.FENCED_GROUP_NAME = db2fsdm1       ** char(30)  no spaces
 ** If no value is provided for FENCED_GID keyword, the DB2 installer will
 ** generate one for you. This is highly recommended.
 *DB2_INST.FENCED_GID      =                 ** Unsigned integer
-*DB2_INST.FENCED_HOME_DIRECTORY =           ** char(64) no spaces
+DB2_INST.FENCED_HOME_DIRECTORY = /home/db2sdfe1          ** char(64) no spaces
 
 ** This FENCED_PASSWORD is required if the fenced user ID is a new user
-*DB2_INST.FENCED_PASSWORD =                 ** char(8)
+DB2_INST.FENCED_PASSWORD = db2sdfe1                ** char(8)
 
 ** Text Search Configuration
 ** -------------------------
