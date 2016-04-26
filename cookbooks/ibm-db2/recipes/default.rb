@@ -5,7 +5,6 @@
 # Copyright 2016, Elten Group (Pty) Ltd.
 #
 # All rights reserved - Do Not Redistribute
-#
 #!/bin/bash
 
 log "  Install DB2"
@@ -26,8 +25,9 @@ chmod -R 755 /tmp/db2_install
 cd /tmp/db2_install/expc/
 
 ./db2setup -r /tmp/db2_install/db2-express.rsp
-/opt/ibm/db2/V10.5/instance/db2icrt -p 50000 -u db2fenc1 db2inst1
 echo "db2inst1" | passwd db2inst1 --stdin
+
+notifies :run, "execute[setup-ibm-java]", :immediately
 
 su - db2inst1
 db2start
