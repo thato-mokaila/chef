@@ -136,9 +136,6 @@ log " # installing DB2 Express C v10.5 using response file - /tmp/db2.rsp ..."
 bash "install_db2_using_response_file" do
     code <<-EOH
 
-echo "#**********************************************************"
-echo "# installing DB2 Express C v10.5 ...					     "
-echo "#**********************************************************"
 export PATH=/opt/ibm/db2/V10.5/bin/:$PATH 
 
 cd /tmp/db2_install/
@@ -148,7 +145,14 @@ cd /tmp/db2_install/expc/
 
 ./db2setup -r /tmp/db2_install/db2-express.rsp
 . /home/db2inst1/sqllib/db2profile
+
+echo "db2inst1" | passwd db2inst1 --stdin
+echo "db2admin" | passwd db2admin --stdin
+
 su -c "/opt/ibm/db2/V10.5/bin/db2sampl" db2admin
+
+su -c "/home/db2inst1/sqllib/bin/db2 catalog tcpip node NODE000 remote localhost server 50000" db2inst1
+su -c "/home/db2inst1/sqllib/bin/db2 catalog database SAMPLE as SAMPLE at node NODE000 authentication server" db2inst1
 
 #/opt/ibm/db2/v10.5/instance/dascrt -u db2admin
 #/opt/ibm/db2/v10.5/instance/db2icrt -a server -u db2fenc1 db2inst1
@@ -157,7 +161,7 @@ su -c "/opt/ibm/db2/V10.5/bin/db2sampl" db2admin
 EOH
 end
 
-log "  # onfiguring DB2 Express C v10.5 java environment"
+log "  # configuring DB2 Express C v10.5 java environment"
 bash "setup-ibm-java" do
 code <<-EOH
     update-alternatives --install "/usr/bin/java" "java" "/opt/ibm/db2/V10.5/java/jdk64/jre/bin/java" 0
