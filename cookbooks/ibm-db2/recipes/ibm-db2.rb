@@ -182,8 +182,8 @@ EOH
 action :nothing
 end
 
-execute_as_user "db2admin start" do
-  user node[:db2][:instance][:username]
-  action :run
-end
+#execute_as_user "db2admin start" do
+#  user node[:db2][:instance][:username]
+#  action :run
+#end
 
