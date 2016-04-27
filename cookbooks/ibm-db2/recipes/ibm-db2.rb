@@ -82,6 +82,43 @@ directory "/home/db2admin" do
   action :create
 end
 
+# #####################################
+# #####################################
+#for db_user in db_users do
+#
+#    home = "/home/#{db_user}"
+#
+#    file "#{home}/.profile" do
+#        owner db_user
+#    end
+#
+#    execute "/opt/ibm/db2/V10.5/instance/db2icrt -s client #{db_user}" do
+#        creates "#{home}/sqllib"
+#    end
+#
+#    execute "#{home}/sqllib/bin/db2 catalog tcpip node #{db_node} remote localhost server 50000" do
+#        user db_user
+#        ignore_failure true   
+#    end
+#
+#    execute "#{home}/sqllib/bin/db2 catalog database #{db_database} as #{db_database} at node #{db_node}" do
+#        user db_user
+#        ignore_failure true   
+#    end
+#
+#    execute "#{home}/sqllib/bin/db2 terminate" do
+#        user db_user
+#        ignore_failure true   
+#    end
+#
+#    execute "cp #{home}/.profile #{home}/.bashrc" do
+#        creates "#{home}/.bashrc"
+#    end
+#
+#end
+# #####################################
+# #####################################
+
 # update kernel parameters
 bash "update_kernel_parameters" do
 code <<-EOH
@@ -95,7 +132,7 @@ sysctl -w kernel.shmmax=17179869184
 EOH
 end
 
-log "  Configure DB2 Install Response file - /tmp/db2.rsp"
+log " # installing DB2 Express C v10.5 using response file - /tmp/db2.rsp ..."
 bash "install_db2_using_response_file" do
     code <<-EOH
 
@@ -109,8 +146,9 @@ tar -xvzf ./v10.5_linuxx64_expc.tar.gz
 chmod -R 755 /tmp/db2_install
 cd /tmp/db2_install/expc/
 
-#./db2setup -r /tmp/db2_install/db2-express.rsp
-#su -c "/opt/ibm/db2/V10.5/bin/db2sampl" db2admin
+./db2setup -r /tmp/db2_install/db2-express.rsp
+. /home/db2inst1/sqllib/db2profile
+su -c "/opt/ibm/db2/V10.5/bin/db2sampl" db2admin
 
 #/opt/ibm/db2/v10.5/instance/dascrt -u db2admin
 #/opt/ibm/db2/v10.5/instance/db2icrt -a server -u db2fenc1 db2inst1
@@ -119,7 +157,7 @@ cd /tmp/db2_install/expc/
 EOH
 end
 
-log "  Configure DB2 Install Response file - /tmp/db2.rsp"
+log "  # onfiguring DB2 Express C v10.5 java environment"
 bash "setup-ibm-java" do
 code <<-EOH
     update-alternatives --install "/usr/bin/java" "java" "/opt/ibm/db2/V10.5/java/jdk64/jre/bin/java" 0
