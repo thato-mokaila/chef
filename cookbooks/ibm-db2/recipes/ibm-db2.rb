@@ -164,7 +164,7 @@ echo "# ******************************************* #"
 
 su -c "/home/db2inst1/sqllib/bin/db2 catalog tcpip node NODE000 remote localhost server 50000" db2inst1
 su -c "/home/db2inst1/sqllib/bin/db2 catalog database SAMPLE as SAMPLE at node NODE000 authentication server" db2inst1
-su -c "/home/db2inst1/sqllib/bin/db2 catalog database LUNOSDEV as LUNOSDEV at node NODE000 authentication server" db2inst1
+#su -c "/home/db2inst1/sqllib/bin/db2 catalog database LUNOSDEV as LUNOSDEV at node NODE000 authentication server" db2inst1
 
 #/opt/ibm/db2/v10.5/instance/dascrt -u db2admin
 #/opt/ibm/db2/v10.5/instance/db2icrt -a server -u db2fenc1 db2inst1
