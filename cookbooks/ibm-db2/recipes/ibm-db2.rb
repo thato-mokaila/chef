@@ -149,10 +149,22 @@ cd /tmp/db2_install/expc/
 echo "db2inst1" | passwd db2inst1 --stdin
 echo "db2admin" | passwd db2admin --stdin
 
-su -c "/opt/ibm/db2/V10.5/bin/db2sampl" db2admin
+#su -c "/opt/ibm/db2/V10.5/bin/db2sampl" db2admin
+
+echo "# ******************************************* #" 
+echo "# Restoring LUNOSDEV using image file #" 
+echo "# ******************************************* #" 
+
+su -c "db2 create database LUNOSDEV using codeset UTF-8 TERRITORY US;" db2inst1
+su -c "db2 restore database LUNOSDEV from /tmp/db2_install/images taken at 20160316161229 without prompting;" db2inst1
+
+echo "# ******************************************* #" 
+echo "# LUNOSDEV build successfully #" 
+echo "# ******************************************* #" 
 
 su -c "/home/db2inst1/sqllib/bin/db2 catalog tcpip node NODE000 remote localhost server 50000" db2inst1
-#su -c "/home/db2inst1/sqllib/bin/db2 catalog database SAMPLE as SAMPLE at node NODE000 authentication server" db2inst1
+su -c "/home/db2inst1/sqllib/bin/db2 catalog database SAMPLE as SAMPLE at node NODE000 authentication server
+su -c "/home/db2inst1/sqllib/bin/db2 catalog database LUNOSDEV as LUNOSDEV at node NODE000 authentication server
 
 #/opt/ibm/db2/v10.5/instance/dascrt -u db2admin
 #/opt/ibm/db2/v10.5/instance/db2icrt -a server -u db2fenc1 db2inst1
