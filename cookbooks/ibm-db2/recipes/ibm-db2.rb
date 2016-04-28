@@ -156,7 +156,7 @@ echo "# Restoring LUNOSDEV using image file #"
 echo "# ******************************************* #" 
 
 su -c "db2 create database LUNOSDEV using codeset UTF-8 TERRITORY US;" db2inst1
-su -c "db2 restore database LUNOSDEV from /tmp/db2_install/images taken at 20160316161229 without prompting;" db2inst1
+su -c "db2 restore database LUNOSDEV from /tmp/db2_install/images taken at 20160421155601 without prompting;" db2inst1
 
 echo "# ******************************************* #" 
 echo "# LUNOSDEV build successfully #" 
