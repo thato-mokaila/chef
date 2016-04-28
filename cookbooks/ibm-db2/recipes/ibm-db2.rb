@@ -125,10 +125,10 @@ code <<-EOH
 sysctl -w kernel.sem=250 256000 32 4096
 sysctl -w kernel.msgmnb=65536
 sysctl -w kernel.msgmax=65536
-sysctl -w kernel.msgmni=16384
-sysctl -w kernel.shmmni=4096
-sysctl -w kernel.shmall=8388608
-sysctl -w kernel.shmmax=17179869184
+sysctl -w kernel.msgmni=8192
+sysctl -w kernel.shmmni=2048
+sysctl -w kernel.shmall=8192
+sysctl -w kernel.shmmax=8589934592
 EOH
 end
 
@@ -156,7 +156,7 @@ echo "# Restoring LUNOSDEV using image file #"
 echo "# ******************************************* #" 
 
 su -c "db2 create database LUNOSDEV using codeset UTF-8 TERRITORY US;" db2inst1
-#su -c "db2 restore database LUNOSDEV from /tmp/db2_install/images taken at 20160421155601 without prompting;" db2inst1
+su -c "db2 restore database LUNOSDEV from /tmp/db2_install/images taken at 20160421155601 without prompting;" db2inst1
 
 echo "# ******************************************* #" 
 echo "# LUNOSDEV build successfully #" 
