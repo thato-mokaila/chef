@@ -132,7 +132,7 @@ sysctl -w kernel.shmmax=17179869184
 EOH
 end
 
-log " # installing DB2 Express C v10.5 using response file - /tmp/db2.rsp ..."
+log "# installing DB2 Express C v10.5 using response file - /tmp/db2_install/db2-express.rsp ..."
 bash "install_db2_using_response_file" do
     code <<-EOH
 
@@ -156,7 +156,7 @@ echo "# Restoring LUNOSDEV using image file #"
 echo "# ******************************************* #" 
 
 su -c "db2 create database LUNOSDEV using codeset UTF-8 TERRITORY US;" db2inst1
-su -c "db2 restore database LUNOSDEV from /tmp/db2_install/images taken at 20160421155601 without prompting;" db2inst1
+#su -c "db2 restore database LUNOSDEV from /tmp/db2_install/images taken at 20160421155601 without prompting;" db2inst1
 
 echo "# ******************************************* #" 
 echo "# LUNOSDEV build successfully #" 
@@ -173,7 +173,7 @@ su -c "/home/db2inst1/sqllib/bin/db2 catalog database SAMPLE as SAMPLE at node N
 EOH
 end
 
-log "  # configuring DB2 Express C v10.5 java environment"
+log "# configuring DB2 Express C v10.5 java environment"
 bash "setup-ibm-java" do
 code <<-EOH
     update-alternatives --install "/usr/bin/java" "java" "/opt/ibm/db2/V10.5/java/jdk64/jre/bin/java" 0
