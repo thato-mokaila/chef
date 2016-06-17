@@ -12,7 +12,7 @@ Log:
    LogFilePages=16384
    LogType=CIRCULAR
    LogBufferPages=512
-   LogPath=/var/mqm/LOCAL.QUE.MGR_LOG/LOCAL.QUE.MGR/
+   LogPath=/var/mqm/LOCALQUEMGR_LOG/LOCALQUEMGR/
    LogWriteIntegrity=TripleWrite
 Service:
    Name=AuthorizationService
