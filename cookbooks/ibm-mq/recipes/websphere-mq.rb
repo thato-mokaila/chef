@@ -162,7 +162,7 @@ execute 'display_mq_version' do
     user 'root'
 end
 
-# create queue manager data directories /var/mqm/LOCAL.QUE.MRG_DATA
+# create queue manager data directories /var/mqm/LOCAL.QUE.MGR_DATA
 directory "#{node[:MQ][:QMGR][:DATAPATH]}" do
     owner 'mqm'
     group 'mqm'
@@ -171,7 +171,7 @@ directory "#{node[:MQ][:QMGR][:DATAPATH]}" do
     ignore_failure true
 end
 
-# create queue manager log directories /var/mqm/LOCAL.QUE.MRG_LOG
+# create queue manager log directories /var/mqm/LOCAL.QUE.MGR_LOG
 directory "#{node[:MQ][:QMGR][:LOGPATH]}" do
     owner 'mqm'
     group 'mqm'
