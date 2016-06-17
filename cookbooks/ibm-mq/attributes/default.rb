@@ -7,7 +7,7 @@ default[:MQ][:LD_LIBRARY_PATH] = ""
 default[:MQ][:JAVA_HOME] = ""
 default[:MQ][:PATH] = ""
 
-default[:MQ][:QM] = "DEV_QM"
+default[:MQ][:QM] = "LOCAL.QUE.MRG"
 default[:MQ][:PORT] = "1414"
 default[:MQ][:REQUESTQ] = "REQUEST_Q"
 default[:MQ][:REPLYQ] = "REPLY_Q"
