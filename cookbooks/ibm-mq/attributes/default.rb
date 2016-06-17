@@ -38,8 +38,8 @@ default[:MQ][:SHMMNI]="8192"
 default[:MQ][:SHMALL]="536870912"
 default[:MQ][:SHMAX]="137438953472"
 
-default[:MQ][:QMGR][:DATAPATH] = "/var/mqm/DEV_QM_DATA"
-default[:MQ][:QMGR][:LOGPATH]	 = "/var/mqm/DEV_QM_LOG"
+default[:MQ][:QMGR][:DATAPATH] = "/var/mqm/LOCAL.QUE.MRG_DATA"
+default[:MQ][:QMGR][:LOGPATH]	 = "/var/mqm/LOCAL.QUE.MRG_LOG"
 
 default[:MQ][:SOURCE][:URL] = "http://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev80_linux_x86-64.tar.gz"
 default[:MQ][:SOURCE][:FILENAME] = "mqadv_dev80_linux_x86-64.tar.gz"
